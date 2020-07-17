@@ -67,36 +67,53 @@ srNo | function | description |
 ### Implementing Your Path Planning Algorithm
 
 #### 1. Set your global home position
-Here students should read the first line of the csv file, extract lat0 and lon0 as floating point values and use the self.set_home_position() method to set global home. Explain briefly how you accomplished this in your code.
+The starter code assumes drones initial position as the global home. we have set this position as the latitude-longitude we read fromthe file (`colliders.csv`). we read the first line of the csv file, extract lat0 and lon0 as floating point values and use the self.set_home_position() method to set global home.
 
-
-And here is a lovely picture of our downtown San Francisco environment from above!
-![Map of SF](./misc/map.png)
+this is done in `motion_planning.py` [line 128-137](motion_planning.py#L128-L137) .
 
 #### 2. Set your current local position
-Here as long as you successfully determine your local position relative to global home you'll be all set. Explain briefly how you accomplished this in your code.
-
-
-Meanwhile, here's a picture of me flying through the trees!
-![Forest Flying](./misc/in_the_trees.png)
+We convert drones global postion into local position relative to global home. 
+This is done in `motion_planning.py` [line 143](motion_planning.py#L143) .
 
 #### 3. Set grid start position from local position
-This is another step in adding flexibility to the start location. As long as it works you're good to go!
+We use th local position offset it with the grid and set start position.
+This is done in `motion_planning.py` [line 154](motion_planning.py#L154) .
 
 #### 4. Set grid goal position from geodetic coords
-This step is to add flexibility to the desired goal location. Should be able to choose any (lat, lon) within the map and have it rendered to a goal location on the grid.
+I have provided 2 ways to set grid goal.
+1. by providing lat long altitude
+try  `python motion_planning.py --goal '-122.40195876, 37.79673913, -0.147'`
+if `--goal` parameter is passed we check if it has all 3 parameters (lat, lon, alt), extract it as float and converts it into local_position and sets grid_goal. `motion_planning.py` [line 240-253](motion_planning.py#L240-L253) and [line 159-163](motion_planning.py#L159-L163) 
+
+2. if goal state is not specified, i randomly sample till i find location which is not inside any colliders. and set it as goal position.
+`motion_planning.py` [line 168-173](motion_planning.py#L168-L173) 
 
 #### 5. Modify A* to include diagonal motion (or replace A* altogether)
-Minimal requirement here is to modify the code in planning_utils() to update the A* implementation to include diagonal motions on the grid that have a cost of sqrt(2), but more creative solutions are welcome. Explain the code you used to accomplish this step.
+I have added diagonal states (NORTH_WEST, NORTH_EAST, SOUTH_WEST, SOUTH_EAST) `planning_utils.py` [line 59-62](planning_utils.py#L59-L62)
+valid actions for this states are determined in `planning_utils.py` [line 93-100](planning_utils.py#L93-L100)
 
 #### 6. Cull waypoints 
-For this step you can use a collinearity test or ray tracing method like Bresenham. The idea is simply to prune your path of unnecessary waypoints. Explain the code you used to accomplish this step.
+For this step I have used a collinearity test and ray tracing method Bresenham. The idea is simply to prune your path of unnecessary waypoints. 
 
+In `motion_planning.py` i call the prun function and pass grid and path found by a* algo [line 159-163](motion_planning.py#L159-L163). Inside prun function i do collinearity check which is defined in `planning_utils.py` [line 167-170](planning_utils.py#L167-L170). After collinearity i use Bresenham library to do ray tracing.
 
+Prun function is defined in `planning_utils.py` [line 182-201](planning_utils.py#L182-L201).
+
+### Heading
+I am also setting heading command. As told in `readme.md`
+`motion_planning.py` [line 187-197](motion_planning.py#L187-L197)
+
+### MAP
+On computing the path i also pop a plot showing map with the computed path
+`motion_planning.py` [line 201-212](motion_planning.py#L201-L212). 
+
+### INFO
+If the goal state is set way far it might take some time to compute the path. hence i have changed the timeout to 10 minutes. `motion_planning.py` [line 256](motion_planning.py#L256). 
 
 ### Execute the flight
 #### 1. Does it work?
 It works!
+
 
 ### Double check that you've met specifications for each of the [rubric](https://review.udacity.com/#!/rubrics/1534/view) points.
   

@@ -125,7 +125,7 @@ class MotionPlanning(Drone):
 
         self.target_position[2] = TARGET_ALTITUDE
 
-        # TODO: read lat0, lon0 from colliders into floating point values
+        # read lat0, lon0 from colliders into floating point values
         csv_init_param = []
         with open('colliders.csv') as csvFile:
             reader = csv.reader(csvFile)
@@ -136,10 +136,10 @@ class MotionPlanning(Drone):
         lat0 = float(csv_init_param["lat0"])
         lon0 = float(csv_init_param["lon0"])
 
-        # TODO: set home position to (lon0, lat0, 0)
+        # set home position to (lon0, lat0, 0)
         self.set_home_position(lon0, lat0, 0)
-        # TODO: retrieve current global position        
-        # TODO: convert to current local position using global_to_local()
+        # retrieve current global position        
+        # convert to current local position using global_to_local()
         local_north, local_east, local_down = global_to_local(self.global_position, self.global_home)
         print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
                                                                          self.local_position))
@@ -152,57 +152,37 @@ class MotionPlanning(Drone):
 
         # Define starting point on the grid (this is just grid center)
         grid_start = (int(np.ceil(local_north-north_offset)), int(np.ceil(local_east-east_offset)))
-        # TODO: convert start position to current position rather than map center
-        
-        # Set goal as some arbitrary position on the grid
-        #grid_goal = (-north_offset + 10, -east_offset + 10)
 
-        # TODO: adapt to set goal as latitude / longitude position and convert
-        #random goal
+        # convert start position to current position rather than map center        
 
-        #global_goal = (self.global_position[0], self.global_position[1]+0.001, self.global_position[2]) #(-122.3974533, 37.7924804, 0.) #local_to_global((750,370, 0), self.global_home)
-        #print("global goal:",global_goal)
+        # adapt to set goal as latitude / longitude position and convert
         grid_goal = None
         if self.global_goal is not None:
             print("global goal:", global_goal)
             local_goal_north, local_goal_east, local_goal_down = global_to_local(global_goal, self.global_home)
-            #local_goal_north, local_goal_east= (local_north+150,local_east-30)
             grid_goal = (int(np.ceil(local_goal_north-north_offset)) , int(np.ceil(local_goal_east-east_offset)))
             
             if (grid[grid_goal[0],grid_goal[1]]==1):
                 print("goal :", goal," is inside an obstruction. ")
 
+        # Set goal as some arbitrary position on the grid if goal is not set
         if grid_goal is None:
-            #random goal
+            #random goal which is unobstructed.
             grid_goal = (int(random.uniform(0,grid.shape[0])), int(random.uniform(0, grid.shape[1])))
             while grid[grid_goal[0],grid_goal[1]]==1:
                 grid_goal = (int(random.uniform(0,grid.shape[0])), int(random.uniform(0, grid.shape[1])))
 
         # Run A* to find a path from start to goal
-        # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
+        # add diagonal motions with a cost of sqrt(2) to your A* implementation
         # or move to a different search space such as a graph (not done here)
         print('Local Start and Goal: ', grid_start, grid_goal)
         path, _ = a_star(grid, heuristic, grid_start, grid_goal)
-        # TODO: prune path to minimize number of waypoints
-        # TODO (if you're feeling ambitious): Try a different approach altogether!
+        #  prune path to minimize number of waypoints
+        # TODO : (if you're feeling ambitious): Try a different approach altogether!
         new_path = prune_path(grid, path)
 
         # Convert path to waypoints
         #waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in new_path]
-
-        #display the path on map
-        plt.imshow(grid, origin='lower') 
-        plt.plot(grid_start[1], grid_start[0], 'x')
-        plt.plot(grid_goal[1], grid_goal[0], 'x')
-
-        if path is not None:
-            pp = np.array(path)
-            plt.plot(pp[:, 1], pp[:, 0], 'g')
-        plt.xlabel('EAST')
-        plt.ylabel('NORTH')
-        plt.draw()
-        plt.pause(0.001)
-        #plt.show()
 
         #adding heading command
         waypoints = []
@@ -217,9 +197,23 @@ class MotionPlanning(Drone):
             waypoints.append([waypoint_north, waypoint_east, TARGET_ALTITUDE, heading])
 
         print("waypoints:", waypoints)
+
+        #display the path on map
+        plt.imshow(grid, origin='lower') 
+        plt.plot(grid_start[1], grid_start[0], 'x')
+        plt.plot(grid_goal[1], grid_goal[0], 'x')
+
+        if path is not None:
+            pp = np.array(path)
+            plt.plot(pp[:, 1], pp[:, 0], 'g')
+        plt.xlabel('EAST')
+        plt.ylabel('NORTH')
+        plt.draw()
+        plt.pause(0.001)
+
         # Set self.waypoints
         self.waypoints = waypoints
-        # TODO: send waypoints to sim (this is just for visualization of waypoints)
+        # send waypoints to sim (this is just for visualization of waypoints)
         self.send_waypoints()
 
     def start(self):
@@ -259,7 +253,7 @@ if __name__ == "__main__":
             global_goal =None
 
 
-    conn = MavlinkConnection('tcp:{0}:{1}'.format(args.host, args.port), timeout=600)
+    conn = MavlinkConnection('tcp:{0}:{1}'.format(args.host, args.port), timeout=60*3)
     drone = MotionPlanning(conn, global_goal)
     time.sleep(1)
 
