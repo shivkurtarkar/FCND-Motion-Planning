@@ -2,6 +2,7 @@ from enum import Enum
 from queue import PriorityQueue
 import numpy as np
 
+from bresenham import bresenham
 
 def create_grid(data, drone_altitude, safety_distance):
     """
@@ -55,6 +56,10 @@ class Action(Enum):
     EAST = (0, 1, 1)
     NORTH = (-1, 0, 1)
     SOUTH = (1, 0, 1)
+    NORTH_WEST = (-1, -1, np.sqrt(2))
+    NORTH_EAST = (-1, 1, np.sqrt(2))
+    SOUTH_WEST = (1, -1, np.sqrt(2))
+    SOUTH_EAST = (1, 1, np.sqrt(2))
 
     @property
     def cost(self):
@@ -84,6 +89,15 @@ def valid_actions(grid, current_node):
         valid_actions.remove(Action.WEST)
     if y + 1 > m or grid[x, y + 1] == 1:
         valid_actions.remove(Action.EAST)
+
+    if (x - 1 < 0 or y - 1 < 0) or grid[x - 1, y - 1] == 1:
+        valid_actions.remove(Action.NORTH_WEST)
+    if (x - 1 < 0 or y + 1 > m) or grid[x - 1, y + 1] == 1:
+        valid_actions.remove(Action.NORTH_EAST)
+    if (x + 1 > n or y - 1 < 0) or grid[x + 1, y - 1] == 1:
+        valid_actions.remove(Action.SOUTH_WEST)
+    if (x + 1 > n or y + 1 > m) or grid[x + 1, y + 1] == 1:
+        valid_actions.remove(Action.SOUTH_EAST)
 
     return valid_actions
 
@@ -144,3 +158,44 @@ def a_star(grid, h, start, goal):
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
+
+# custom functions
+
+def point(p):
+    return np.array([p[0], p[1], 1.]).reshape(1, -1)
+
+def collinearity_check(p1, p2, p3, epsilon=1e-6):   
+    m = np.concatenate((p1, p2, p3), 0)
+    det = np.linalg.det(m)
+    return abs(det) < epsilon
+
+def unobstructed(grid, start, end):
+    line = bresenham(int(start[0]), int(start[1]), int(end[0]), int(end[1]))
+    is_clear = True
+    for point in line:
+        if grid[point[0], point[1]] == 1:
+            is_clear = False
+            break
+    return is_clear
+
+# prune the path
+def prune_path(grid, path):
+    if path is not None:
+        pruned_path_p1 = [] 
+        pruned_path_p1.append(path[0])
+        # collinearity check
+        for i in range(1, len(path)-2):
+            if not collinearity_check(point(path[i-1]), point(path[i]), point(path[i+1])):
+                pruned_path_p1.append(path[i])
+        pruned_path_p1.append(path[-1])
+        
+        pruned_path = [] 
+        # prune the path! using bresenham
+        pruned_path.append(pruned_path_p1[0])
+        for i in range(1, len(pruned_path_p1)-2):
+            if not unobstructed(grid, pruned_path_p1[i-1], pruned_path_p1[i+1]):
+                pruned_path.append(pruned_path_p1[i])
+        pruned_path.append(pruned_path_p1[-1])    
+    else:
+        pruned_path = path
+    return pruned_path
