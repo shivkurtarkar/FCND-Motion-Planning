@@ -86,3 +86,6 @@ Put all of these together and make up your own crazy paths to fly! Can you fly a
 ![Double Helix](./misc/double_helix.gif)
 
 Ok flying a double helix might seem like a silly idea, but imagine you are an autonomous first responder vehicle. You need to first fly to a particular building or location, then fly a reconnaissance pattern to survey the scene! Give it a try!
+
+## Writeup
+{{writeup.md}}

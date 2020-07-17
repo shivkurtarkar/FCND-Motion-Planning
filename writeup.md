@@ -38,7 +38,7 @@ srNo | function | description |
 5 | class Action| defines all possible actions, cost for the action and delta to be applied if the action is chosen|
 
 `motion_planning.py`
-![Top Down View](./misc/state_diagram.jpg)
+![State diagram](./misc/state_diagram.jpg)
 `motion_planning.py` is modified version of `backyard_flyer.py`.  `backyard_flyer.py` has predefined path while `motion_planning.py` plans a path based on start position and goal position. For this it has extra planning state. Here we preplan the path and execute whole at once. 
 `motion_planning.py` has 3 callback function and state transition functions which handles the function of each state.
 
@@ -108,11 +108,15 @@ On computing the path i also pop a plot showing map with the computed path
 `motion_planning.py` [line 201-212](motion_planning.py#L201-L212). 
 
 ### INFO
-If the goal state is set way far it might take some time to compute the path. hence i have changed the timeout to 10 minutes. `motion_planning.py` [line 256](motion_planning.py#L256). 
+If the goal state is set way far it might take some time to compute the path. hence i have changed the timeout to 3 minutes. `motion_planning.py` [line 256](motion_planning.py#L256). 
 
 ### Execute the flight
 #### 1. Does it work?
 It works!
+![drone in flight snap1](./misc/flightsnap1.png)
+![drone in flight snap2](./misc/flightsnap2.png)
+
+![drone in flight video](./misc/flight.mp4)
 
 
 ### Double check that you've met specifications for each of the [rubric](https://review.udacity.com/#!/rubrics/1534/view) points.
