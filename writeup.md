@@ -28,7 +28,7 @@ You're reading it! Below I describe how I addressed each rubric point and where 
 
 #### 1. Explain the functionality of what's provided in `motion_planning.py` and `planning_utils.py`
 
-`planning_utils.py`
+## `planning_utils.py`
 srNo | function | description |
 --- | --- | --- |
 1 | fn create_grid| this function takes in data read from csv about obstacles and for each obstacle  |
@@ -37,7 +37,7 @@ srNo | function | description |
 4 | fn heuristic| this function takes in 2 positions and calculates heuristic between them. implementation uses euclidean distance as hiuristic|
 5 | class Action| defines all possible actions, cost for the action and delta to be applied if the action is chosen|
 
-`motion_planning.py`
+## `motion_planning.py`
 ![State diagram](./misc/state_diagram.jpg)
 `motion_planning.py` is modified version of `backyard_flyer.py`.  `backyard_flyer.py` has predefined path while `motion_planning.py` plans a path based on start position and goal position. For this it has extra planning state. Here we preplan the path and execute whole at once. 
 `motion_planning.py` has 3 callback function and state transition functions which handles the function of each state.
@@ -56,7 +56,7 @@ srNo | function | description |
 10|plan_path|this function handles all the planning of drones path from start position to goal position.|
 
 
-`plan_path`
+## `fn plan_path`
 - Load the 2.5D map in the `colliders.csv` file describing the environment.
 - Discretize the environment into a grid or graph representation.
 - Define the start and goal locations.
