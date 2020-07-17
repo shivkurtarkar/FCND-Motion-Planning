@@ -24,6 +24,8 @@ git clone https://github.com/udacity/FCND-Motion-Planning
 ### Step 4: Test setup
 The first task in this project is to test the [solution code](https://github.com/udacity/FCND-Motion-Planning/blob/master/backyard_flyer_solution.py) for the Backyard Flyer project in this new simulator. Verify that your Backyard Flyer solution code works as expected and your drone can perform the square flight path in the new simulator. To do this, start the simulator and run the [`backyard_flyer_solution.py`](https://github.com/udacity/FCND-Motion-Planning/blob/master/backyard_flyer_solution.py) script.
 
+please install additional dependencies using `pip install -r requirements.txt`
+
 ```sh
 source activate fcnd # if you haven't already sourced your Python environment, do so now.
 python backyard_flyer_solution.py
